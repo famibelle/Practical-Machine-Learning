@@ -1,16 +1,16 @@
 ---
 title: "Practical Machine Learning Project"
-author: "Famibelle Médhi"
+author: "Famibelle Medhi"
 date: "Sunday, November 23, 2014"
-output: html_document
+output: pdf_document
 ---
 
 The goal of the project is to predict the manner in which the tech geeks did the exercise. This is the "classe" variable in the training set.
 
 ```{r}
 setwd("~/Coursera/data/Practical Machine Learning")
-#install.packages("e1071")
-library(caret)
+install.packages("e1071")
+install.packages("caret")
 
 pml_write_files = function(x){
     n = length(x)
@@ -61,6 +61,7 @@ pml_testing  <- pml_testing[ , -notPredictors]
 #BootStrap
 use 75% of the data to train the model and 25% to test the model. That's give us a subset of the data that is just for training `training` and a subset of the data that is just for testing `testing`
 ```{r}
+library(caret)
 inTrain = createDataPartition(pml_training$classe, p = 0.75, list = FALSE)
 training = pml_training[inTrain,]   # subset of the data for training
 testing  = pml_training[-inTrain,]  # subset of the data for testing
@@ -70,8 +71,8 @@ testing  = pml_training[-inTrain,]  # subset of the data for testing
 Now we can fit a model. We are going to use the `train` from that caret package. We are going to predict `classe` from the dataset `training` created above. We are going to use the GBM method.
 ```{r}
 set.seed(1974)
-load("ModelFit.Rdata")
-#modelFit <- train(classe ~ . , data=training, method="gbm")
+#load("ModelFit.Rdata")
+modelFit <- train(classe ~ . , data=training, method="gbm")
 ```
 
 ```{r}
