@@ -1,6 +1,6 @@
 ---
 title: "Practical Machine Learning Project"
-author: "Famibelle Médhi"
+author: "Famibelle MÃ©dhi"
 date: "Sunday, November 23, 2014"
 output: html_document
 ---
@@ -19,9 +19,10 @@ pml_write_files = function(x){
         write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
     }
 }
+```
+# Load the data
 
 ```{r}
-# Load the data
 if (!file.exists("pml-training.csv")) {
     fileURL <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
     message(paste("Please Wait! Download...", fileURL, "..."))
@@ -49,7 +50,7 @@ pml_training <- pml_training[, ColsWithNAs]
 pml_testing  <- pml_testing[ , ColsWithNAs]
 ```
 
-The  "X", "user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", "cvtd_timestamp", [6] "new_window", "num_window" are not part of the predictors and then can be removed from the model
+The  `X`, `user_name`, `raw_timestamp_part_1`, `raw_timestamp_part_2`, `cvtd_timestamp`, `new_window`, `num_window` are not part of the predictors and then can be removed from the model
 
 ```{r}
 notPredictors <- 1:7
@@ -83,7 +84,7 @@ modelFit$finalModel
 
 We are going to predict the testing data `testing` by using the predict command based on the `modelFit` calculated above
 ```{r}
-predictions <- predict(modelFit,newdata=testing)
+predictions <- predict(modelFit, newdata=testing)
 ```
 
 # calculating the confusion matrix
@@ -93,10 +94,13 @@ confusionMatrix.PML <- confusionMatrix(predictions,testing$classe)
 confusionMatrix.PML
 ```
 
-Accuracy is around 96%
-`r confusionMatrix.PML$overall[1]`
+**Accuracy is `r confusionMatrix.PML$overall[1]`**
+
+# Now the predictions
+Remember that the goal of the project was to predict the manner in which the tech geeks did the exercise. So we apply the model to test data `pml_testing`
 
 ```{r}
 answers <- predict(modelFit,newdata=pml_testing)
 pml_write_files(answers)
+answers
 ```
