@@ -1,0 +1,102 @@
+---
+title: "Practical Machine Learning Project"
+author: "Famibelle Médhi"
+date: "Sunday, November 23, 2014"
+output: html_document
+---
+
+The goal of the project is to predict the manner in which the tech geeks did the exercise. This is the "classe" variable in the training set.
+
+```{r}
+setwd("~/Coursera/data/Practical Machine Learning")
+#install.packages("e1071")
+library(caret)
+
+pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+        filename = paste0("problem_id_",i,".txt")
+        write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+}
+
+```{r}
+# Load the data
+if (!file.exists("pml-training.csv")) {
+    fileURL <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+    message(paste("Please Wait! Download...", fileURL, "..."))
+    download.file(fileURL, destfile = "pml-training.csv")
+}
+
+if (!file.exists("pml-testing.csv")) {
+    fileURL <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+    message(paste("Please Wait! Download...", fileURL, "..."))
+    download.file(fileURL, destfile = "pml-testing.csv")
+}
+```
+
+# Clean the data
+
+```{r}
+pml_testing <-  read.csv("pml-testing.csv" , na.strings = c("", "NA"))
+pml_training <- read.csv("pml-training.csv", na.strings = c("", "NA"))
+```
+# Remove all the columns filled with NAs.
+
+```{r}
+ColsWithNAs <- colSums(is.na(pml_training)) == 0
+pml_training <- pml_training[, ColsWithNAs]
+pml_testing  <- pml_testing[ , ColsWithNAs]
+```
+
+The  "X", "user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", "cvtd_timestamp", [6] "new_window", "num_window" are not part of the predictors and then can be removed from the model
+
+```{r}
+notPredictors <- 1:7
+pml_training <- pml_training[, -notPredictors]
+pml_testing  <- pml_testing[ , -notPredictors]
+```
+
+#BootStrap
+use 75% of the data to train the model and 25% to test the model. That's give us a subset of the data that is just for training `training` and a subset of the data that is just for testing `testing`
+```{r}
+inTrain = createDataPartition(pml_training$classe, p = 0.75, list = FALSE)
+training = pml_training[inTrain,]   # subset of the data for training
+testing  = pml_training[-inTrain,]  # subset of the data for testing
+```
+
+# Fit a model
+Now we can fit a model. We are going to use the `train` from that caret package. We are going to predict `classe` from the dataset `training` created above. We are going to use the GBM method.
+```{r}
+set.seed(1974)
+load("ModelFit.Rdata")
+#modelFit <- train(classe ~ . , data=training, method="gbm")
+```
+
+```{r}
+modelFit
+```
+
+```{r}
+modelFit$finalModel
+```
+
+We are going to predict the testing data `testing` by using the predict command based on the `modelFit` calculated above
+```{r}
+predictions <- predict(modelFit,newdata=testing)
+```
+
+# calculating the confusion matrix
+We are going to run the confusion matrix from the data calculated from our model fit `predictions` against the actual results from the testing data `testing`
+```{r}
+confusionMatrix.PML <- confusionMatrix(predictions,testing$classe)
+confusionMatrix.PML
+```
+
+Accuracy is around 96%
+`r confusionMatrix.PML$overall[1]`
+
+```{r}
+answers <- predict(modelFit,newdata=pml_testing)
+pml_write_files(answers)
+```
