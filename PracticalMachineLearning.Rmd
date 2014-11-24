@@ -2,15 +2,15 @@
 title: "Practical Machine Learning Project"
 author: "Famibelle Medhi"
 date: "Sunday, November 23, 2014"
-output: pdf_document
+output: html_document
 ---
 
 The goal of the project is to predict the manner in which the tech geeks did the exercise. This is the "classe" variable in the training set.
 
 ```{r}
 setwd("~/Coursera/data/Practical Machine Learning")
-install.packages("e1071")
-install.packages("caret")
+install.packages("e1071", repos="http://cran.rstudio.com/", dependencies = TRUE)
+install.packages("caret", repos="http://cran.rstudio.com/", dependencies = TRUE)
 
 pml_write_files = function(x){
     n = length(x)
@@ -71,8 +71,8 @@ testing  = pml_training[-inTrain,]  # subset of the data for testing
 Now we can fit a model. We are going to use the `train` from that caret package. We are going to predict `classe` from the dataset `training` created above. We are going to use the GBM method.
 ```{r}
 set.seed(1974)
-#load("ModelFit.Rdata")
-modelFit <- train(classe ~ . , data=training, method="gbm")
+load("ModelFit.Rdata")
+#modelFit <- train(classe ~ . , data=training, method="gbm")
 ```
 
 ```{r}
