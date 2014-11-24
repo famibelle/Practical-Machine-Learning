@@ -71,8 +71,8 @@ testing  = pml_training[-inTrain,]  # subset of the data for testing
 Now we can fit a model. We are going to use the `train` from that caret package. We are going to predict `classe` from the dataset `training` created above. We are going to use the GBM method.
 ```{r}
 set.seed(1974)
-load("ModelFit.Rdata")
-#modelFit <- train(classe ~ . , data=training, method="gbm")
+#load("ModelFit.Rdata")
+modelFit <- train(classe ~ . , data=training, method="gbm")
 ```
 
 ```{r}
